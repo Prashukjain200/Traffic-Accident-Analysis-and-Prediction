@@ -18,16 +18,9 @@ def filter_data_by_year(data, start_year, end_year):
     return data[(data['JAHR'] >= start_year) & (data['JAHR'] <= end_year)]
 
 def preprocessig_data(data, category, type, year, month, scaler):
-    # filtered_data = data[
-    #     (data['MONATSZAHL'] == 'Alkoholunfälle') & (data['AUSPRAEGUNG'] == 'insgesamt') & (data['JAHR'] <= 2020)]
-    # series = filtered_data.set_index('DATUM')['WERT'].dropna().values.reshape(-1, 1)
-    # series_reshaped = series.reshape(-1, 1)
-    # scaled_data = scaler.fit_transform(series_reshaped)
 
-    # Convert 'MONAT' to datetime for filtering
     data['DATUM'] = pd.to_datetime(data['MONAT'], format='%Y%m')
 
-    # Filter the data to include records up to the end of the month prior to the selected month and year
     cutoff_date = pd.to_datetime(f"{year}{month:02d}", format='%Y%m')
     filtered_data = data[
         (data['MONATSZAHL'] == category) &
@@ -48,15 +41,13 @@ def preprocessig_data(data, category, type, year, month, scaler):
             sequences.append(data[i:i + sequence_length + 1])
         return np.array(sequences)
 
-    sequence_length = 5  # Number of time steps to look back
+    sequence_length = 5  
     sequences = create_sequences(scaled_data, sequence_length)
     X, y = sequences[:, :-1], sequences[:, -1]
 
-    # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     return X_train, X_test, y_train, y_test
 
-# Function to plot historical data
 def plot_historical_data(data):
     with st.spinner("Generating Graph..."):
         plt.figure(figsize=(15, 6))
@@ -70,8 +61,6 @@ def plot_historical_data(data):
 
     st.pyplot(plt)
 
-
-# Function to plot seasonal analysis
 def plot_seasonal_analysis(data):
     monthly_data = data.groupby(['MONATSZAHL', data['DATUM'].dt.month])['WERT'].mean().reset_index()
     plt.figure(figsize=(15, 6))
@@ -85,8 +74,6 @@ def plot_seasonal_analysis(data):
     st.success('Graph Generated!')
     st.pyplot(plt)
 
-
-# Function to plot yearly comparative analysis
 def plot_yearly_analysis(data):
     yearly_data = data.groupby(['MONATSZAHL', 'JAHR'])['WERT'].sum().reset_index()
     plt.figure(figsize=(15, 6))
@@ -110,7 +97,6 @@ def plot_predicted_graph(predicted, y_test_original):
     st.pyplot(plt)
 
 
-# Function to create and train LSTM model (dummy example)
 def train_lstm_model(X_train, y_train, num_layers, num_nodes, epoch):
     model = Sequential()
     model.add(LSTM(num_nodes, return_sequences=(num_layers > 1), input_shape=(X_train.shape[1], 1)))
@@ -122,18 +108,14 @@ def train_lstm_model(X_train, y_train, num_layers, num_nodes, epoch):
     model.fit(X_train, y_train, epochs=epoch, batch_size=32, validation_split=0.1, callbacks=[early_stopping])
     return model
 
-
-# Main App
 def main():
     st.title("Traffic Accident Analysis and Prediction")
 
-    # Sidebar for navigation
     option = st.sidebar.selectbox('Select an Option', ('Data Visualization', 'Model Training'))
 
     if option == 'Data Visualization':
         st.header("Data Visualization")
 
-        # Display descriptions in the sidebar
         with st.sidebar.expander("Graph Descriptions"):
             st.markdown("""
                 **Historical Number of Accidents**: Shows the total number of accidents over time, highlighting trends and changes in accident frequency.
@@ -163,7 +145,6 @@ def main():
                                      "Comparative Analysis by Year",
                                      "Seasonal Analysis of Accidents"))
 
-        # Submit button
         submit_button = st.button('Generate Graph')
 
         if submit_button:
@@ -182,9 +163,7 @@ def main():
             mime="text/csv",
         )
         st.header("Model Training")
-        # Widgets for model configuration
 
-        # User input widgets for dynamic model training
         category = st.selectbox('Select Category', data['MONATSZAHL'].unique())
         type = st.selectbox('Select Type', data['AUSPRAEGUNG'].unique())
         year = st.selectbox('Select Year', sorted(data['JAHR'].unique(), reverse=True))
@@ -205,18 +184,15 @@ def main():
                     model = train_lstm_model(X_train, y_train, num_layers, num_nodes, epochs)
                     st.success('Training completed. Creating The Comparison Graph!')
 
-                    # Making predictions
                     predicted = model.predict(X_test)
 
-                    # Inverse transformation to original scale
                     predicted = scaler.inverse_transform(predicted)
                     y_test_original = scaler.inverse_transform(y_test)
-                    # Plot the predicted and actual values
+
                     plot_predicted_graph(predicted, y_test_original)
         else:
             st.error("Insufficient data for the selected Category and Type")
 
 
-# Run the app
 if __name__ == "__main__":
     main()
