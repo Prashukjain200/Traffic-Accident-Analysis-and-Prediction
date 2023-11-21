@@ -192,6 +192,9 @@ def main():
                     plot_predicted_graph(predicted, y_test_original)
         else:
             st.error("Insufficient data for the selected Category and Type")
+            
+    st.markdown("---") 
+    st.markdown("Made with ❤️ by Prashuk!")
 
 
 if __name__ == "__main__":
