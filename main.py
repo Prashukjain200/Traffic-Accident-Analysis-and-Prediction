@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
@@ -181,15 +180,35 @@ def main():
             X_train, X_test, y_train, y_test = result
             if st.button('Train Model'):
                 with st.spinner('Training in progress...'):
-                    model = train_lstm_model(X_train, y_train, num_layers, num_nodes, epochs)
+                    filtered_data['UNIX_MONAT'] = filtered_data['MONAT'].apply(lambda x: x.timestamp())
+
+                    X = filtered_data['UNIX_MONAT'].values.reshape(-1, 1)
+                    y = filtered_data['WERT'].values
+
+                    model = Sequential([Bidirectional(LSTM(128, return_sequences=True), input_shape=(X.shape[1], 1)), Dropout(0.2),
+                    Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'), BatchNormalization(),
+                    LSTM(128, return_sequences=False), Dropout(0.2), Dense(128, activation='relu'), Dense(1)])
+
+                    model.compile(optimizer='adam', loss='mean_squared_error')
+
+                    early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+
+                    model.fit(X, y, epochs=100, batch_size=32, validation_split=0.1, callbacks=[early_stopping])
+
+                    # Making predictions
+                    target_timestamp = pd.to_datetime(f"{year}-{month:02d}", format='%Y-%m').timestamp()
+
+                    # Reshape the target timestamp as required by the model
+                    target_timestamp = np.array([[target_timestamp]])
+
+                    # Make predictions using the model
+                    prediction = model.predict(target_timestamp)[0][0]
+        
                     st.success('Training completed. Creating The Comparison Graph!')
 
-                    predicted = model.predict(X_test)
+                    prediction = model.predict(target_timestamp)[0][0]
 
-                    predicted = scaler.inverse_transform(predicted)
-                    y_test_original = scaler.inverse_transform(y_test)
-
-                    plot_predicted_graph(predicted, y_test_original)
+                    st.write(prediction)
         else:
             st.error("Insufficient data for the selected Category and Type")
             
