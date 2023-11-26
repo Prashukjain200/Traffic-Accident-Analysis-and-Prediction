@@ -115,6 +115,7 @@ def train_lstm_model(X_train, y_train, num_layers, num_nodes, epoch):
     model.compile(optimizer='adam', loss='mean_squared_error')
     early_stopping = EarlyStopping(monitor='val_loss', patience=10)
     model.fit(X_train, y_train, epochs=epoch, batch_size=32, validation_split=0.1, callbacks=[early_stopping])
+    model.save(model_name)
     return model
 
 
@@ -200,6 +201,14 @@ def main():
                 with st.spinner('Training in progress...'):
                     model = train_lstm_model(X_train, y_train, num_layers, num_nodes, epochs)
                     st.success('Training completed. Creating The Comparison Graph!')
+
+                    with open(model_name, "rb") as file:
+                        btn = st.download_button(
+                        label="Download trained model",
+                        data=file,
+                        file_name=model_name,
+                        mime="application/octet-stream"
+                        )
 
                     # Making predictions
                     predicted = model.predict(X_test)
