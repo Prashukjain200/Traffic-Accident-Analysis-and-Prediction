@@ -201,7 +201,7 @@ def main():
             if st.button('Train Model'):
                 print(type(year), type(month))
                 with st.spinner('Training in progress...'):
-                    model = train_lstm_model(X_train, y_train, num_layers, num_nodes, epochs)
+                    model, model_path = train_lstm_model(X_train, y_train, num_layers, num_nodes, epochs)
                     st.success('Training completed. Creating The Comparison Graph!')
                     
                     
