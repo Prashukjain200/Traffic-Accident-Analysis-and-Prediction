@@ -140,8 +140,8 @@ def main():
 
         start_year, end_year = st.select_slider(
             "Select a range of years",
-            options=list(range(2000, 2024)),
-            value=(2000, 2023)
+            options=list(range(2000, 2022)),
+            value=(2000, 2021)
         )
 
         if start_year == end_year:
