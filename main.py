@@ -175,7 +175,7 @@ def main():
 
         category = st.selectbox('Select Category', data['MONATSZAHL'].unique())
         typeof = st.selectbox('Select Type', data['AUSPRAEGUNG'].unique())
-        year = st.selectbox('Select Year', sorted([y for y in data['JAHR'].unique() if y not in [2022, 2023]], reverse=True))
+        year = st.selectbox('Select Year', sorted([y for y in data['JAHR'].unique() if y not in ["2022", "2023"]], reverse=True))
         month = st.selectbox('Select Month for Prediction', range(1, 13))
 
         num_layers = st.number_input('Number of LSTM Layers', min_value=1, max_value=10, value=3)
