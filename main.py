@@ -385,19 +385,6 @@ def create_bar_plot(data, title):
     )
     return fig
 
-# def create_heatmap(data, title):
-#     pivot_data = data.pivot(index='MONATSZAHL', columns=data['DATUM'].dt.month, values='WERT')
-#     fig = px.imshow(pivot_data, 
-#                     labels=dict(x="Month", y="Category", color="Average Accidents"),
-#                     x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-#                     title=title)
-#     fig.update_layout(
-#         plot_bgcolor='#2C2C2C',
-#         paper_bgcolor='#1E1E1E',
-#         font_color='#E0E0E0'
-#     )
-#     return fig
-
 
 def create_heatmap(data, title):
     data['MONTH'] = data['DATUM'].dt.month
@@ -474,7 +461,7 @@ def main():
 
         if st.button('Train Model', key='train_model'):
             scaler = MinMaxScaler(feature_range=(0, 1))
-            result = preprocessig_data(data, category, typeof, year, month, scaler)
+            result = preprocessing_data(data, category, typeof, year, month, scaler)
 
             if result[0] is not None:
                 X_train, X_test, y_train, y_test = result
