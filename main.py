@@ -286,14 +286,13 @@ def main():
         <p>Developed with ❤️ by Prashuk</p>
         </div>
         """, unsafe_allow_html=True)
-
-    # Footer
-st.markdown("""
-<hr>
-<p style='text-align: center;'>Crafted with 🧡 by Prashuk | 
-<a href='https://github.com/Prashukjain200' target='_blank'>GitHub</a> | 
-<a href='https://prashuk.netlify.app/' target='_blank'>Portfolio</a></p>
-""", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <hr>
+    <p style='text-align: center;'>Crafted with 🧡 by Prashuk | 
+    <a href='https://github.com/Prashukjain200' target='_blank'>GitHub</a> | 
+    <a href='https://prashuk.netlify.app/' target='_blank'>Portfolio</a></p>
+    """, unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
