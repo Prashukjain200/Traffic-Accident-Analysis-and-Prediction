@@ -401,7 +401,9 @@ def create_bar_plot(data, title):
 
 def create_heatmap(data, title):
     data['MONTH'] = data['DATUM'].dt.month
-    pivot_data = data.pivot(index='MONATSZAHL', columns='MONTH', values='WERT')
+    # Aggregate data if duplicates are found
+    aggregated_data = data.groupby(['MONATSZAHL', 'MONTH']).agg({'WERT': 'mean'}).reset_index()
+    pivot_data = aggregated_data.pivot(index='MONATSZAHL', columns='MONTH', values='WERT')
     fig = px.imshow(pivot_data, 
                     labels=dict(x="Month", y="Category", color="Average Accidents"),
                     x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -412,6 +414,7 @@ def create_heatmap(data, title):
         font_color='#E0E0E0'
     )
     return fig
+
 
 
 # Main app structure
