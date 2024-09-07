@@ -432,6 +432,23 @@ def create_heatmap(data, title):
     return fig
 
 
+def train_lstm_model(X_train, y_train, num_layers, num_nodes, epoch):
+    model = Sequential()
+    model.add(LSTM(num_nodes, return_sequences=(num_layers > 1), input_shape=(X_train.shape[1], 1)))
+    for _ in range(1, num_layers):
+        model.add(LSTM(num_nodes, return_sequences=(_ < num_layers - 1)))
+    model.add(Dense(1))
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+
+    model.fit(X_train, y_train, epochs=epoch, batch_size=32, validation_split=0.1,
+              callbacks=[early_stopping])
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.h5') as tmp:
+        model.save(tmp.name)
+        return model, tmp.name
+
+
 
 # Main app structure
 def main():
