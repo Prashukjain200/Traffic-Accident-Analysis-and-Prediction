@@ -397,6 +397,23 @@ def preprocessig_data(data, category, type, year, month, scaler):
     if filtered_data.empty:
         return None, None, None, None
 
+    series = filtered_data['WERT'].dropna().values.reshape(-1, 1)
+    series_reshaped = series.reshape(-1, 1)
+    scaled_data = scaler.fit_transform(series_reshaped)
+
+    def create_sequences(data, sequence_length):
+        sequences = []
+        for i in range(len(data) - sequence_length):
+            sequences.append(data[i:i + sequence_length + 1])
+        return np.array(sequences)
+
+    sequence_length = 5  # Number of time steps to look back
+    sequences = create_sequences(scaled_data, sequence_length)
+    X, y = sequences[:, :-1], sequences[:, -1]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test
+
 
 def create_heatmap(data, title):
     data['MONTH'] = data['DATUM'].dt.month
