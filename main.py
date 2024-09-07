@@ -385,6 +385,18 @@ def create_bar_plot(data, title):
     )
     return fig
 
+def preprocessig_data(data, category, type, year, month, scaler):
+    data['DATUM'] = pd.to_datetime(data['MONAT'], format='%Y%m')
+
+    cutoff_date = pd.to_datetime(f"{year}{month:02d}", format='%Y%m')
+    filtered_data = data[
+        (data['MONATSZAHL'] == category) &
+        (data['AUSPRAEGUNG'] == type) &
+        (data['DATUM'] < cutoff_date)
+        ]
+    if filtered_data.empty:
+        return None, None, None, None
+
 
 def create_heatmap(data, title):
     data['MONTH'] = data['DATUM'].dt.month
@@ -461,7 +473,7 @@ def main():
 
         if st.button('Train Model', key='train_model'):
             scaler = MinMaxScaler(feature_range=(0, 1))
-            result = preprocessing_data(data, category, typeof, year, month, scaler)
+            result = preprocessig_data(data, category, typeof, year, month, scaler)
 
             if result[0] is not None:
                 X_train, X_test, y_train, y_test = result
