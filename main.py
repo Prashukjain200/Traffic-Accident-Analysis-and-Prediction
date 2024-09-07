@@ -385,8 +385,23 @@ def create_bar_plot(data, title):
     )
     return fig
 
+# def create_heatmap(data, title):
+#     pivot_data = data.pivot(index='MONATSZAHL', columns=data['DATUM'].dt.month, values='WERT')
+#     fig = px.imshow(pivot_data, 
+#                     labels=dict(x="Month", y="Category", color="Average Accidents"),
+#                     x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+#                     title=title)
+#     fig.update_layout(
+#         plot_bgcolor='#2C2C2C',
+#         paper_bgcolor='#1E1E1E',
+#         font_color='#E0E0E0'
+#     )
+#     return fig
+
+
 def create_heatmap(data, title):
-    pivot_data = data.pivot(index='MONATSZAHL', columns=data['DATUM'].dt.month, values='WERT')
+    data['MONTH'] = data['DATUM'].dt.month
+    pivot_data = data.pivot(index='MONATSZAHL', columns='MONTH', values='WERT')
     fig = px.imshow(pivot_data, 
                     labels=dict(x="Month", y="Category", color="Average Accidents"),
                     x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -397,6 +412,7 @@ def create_heatmap(data, title):
         font_color='#E0E0E0'
     )
     return fig
+
 
 # Main app structure
 def main():
